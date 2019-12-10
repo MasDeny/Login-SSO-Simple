@@ -9,8 +9,11 @@ namespace WebApps.Domain.Repositories
 {
     public interface IAuthRepository
     {
-        Task<IEnumerable<User>> ListAsync();  // GetAll
+        Task<IEnumerable<Models.Type>> ListUrlAsync();  // GetAll
+        Task<IEnumerable<Role>> ListRoleAsync();
+
         Task<User> FindByEmailAsync(string email);
         Task AddAsync(User user, ERole[] userRoles, EType[] userTypes);
+        void ChangePasswordAsync(User user);
     }
 }

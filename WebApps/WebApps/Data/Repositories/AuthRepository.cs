@@ -16,14 +16,6 @@ namespace WebApps.Data.Repositories
         {
         }
 
-        public async Task<IEnumerable<User>> ListAsync()
-        {
-            var result = await _context.Users
-                .Where(item => EF.Property<bool>(item, "Void") == false)
-                .ToListAsync();
-            return result;// await _context.Departments.ToListAsync();
-        }
-
         public async Task AddAsync(User user, ERole[] userRoles, EType[] userTypes)
         {
             var roles = await _context.Roles.Where(r => userRoles.Any(ur => ur.ToString() == r.Name))
@@ -53,6 +45,25 @@ namespace WebApps.Data.Repositories
                 .Include(u => u.UserTypes)
                 .ThenInclude(ur => ur.Type)
                 .SingleOrDefaultAsync(u => u.Email == email);
+        }
+
+        public void ChangePasswordAsync(User user)
+        {
+            _context.Users.Update(user).Context.SaveChanges();
+        }
+
+        public async Task<IEnumerable<Domain.Models.Type>>ListUrlAsync()
+        {
+            var result = await _context.Types
+                .ToListAsync();
+            return result;
+        }
+
+        public async Task<IEnumerable<Role>> ListRoleAsync()
+        {
+            var result = await _context.Roles
+                .ToListAsync();
+            return result;
         }
     }
 }

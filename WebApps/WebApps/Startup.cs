@@ -16,17 +16,6 @@ using WebApps.Domain.Services;
 using WebApps.Mapping;
 using WebApps.Security.Hashing;
 using WebApps.Services;
-//using VisMan.Api.Helpers;
-//using VisMan.Api.Mapping;
-//using VisMan.Api.Security.Hashing;
-//using VisMan.Api.Security.Token;
-//using VisMan.Api.Services;
-//using VisMan.Data.Context;
-//using VisMan.Data.Repositories;
-//using VisMan.Domain.Repositories;
-//using VisMan.Domain.Security.Hashing;
-//using VisMan.Domain.Security.Token;
-//using VisMan.Domain.Services;
 
 namespace WebApps
 {

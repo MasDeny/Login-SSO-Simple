@@ -13,5 +13,9 @@ namespace WebApps.Domain.Services
         Task<AuthResponse> CreateUserAsync(User user, ERole[] userRoles, EType[] userTypes);
         Task<User> FindByEmailAsync(string email);
         Task<User> Authenticate(string email, string password);
+        Task<AuthResponse> ChangePasswordAsync(string email, string password, string passwordReset);
+
+        Task<IEnumerable<Models.Type>> ListUrlAsync();
+        Task<IEnumerable<Role>> ListRoleAsync();
     }
 }

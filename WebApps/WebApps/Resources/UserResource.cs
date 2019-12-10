@@ -23,6 +23,7 @@ namespace WebApps.Resources
 
         [StringLength(255)]
         public string Url { get; set; }
+        //public IEnumerable<string> Url { get; set; }
 
         public IEnumerable<string> Roles { get; set; }
         public IEnumerable<string> Types { get; set; }

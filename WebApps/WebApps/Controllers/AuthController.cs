@@ -10,6 +10,8 @@ using WebApps.Resources;
 using WebApps.Extensions;
 using WebApps.Domain.Enum;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Microsoft.Extensions.Configuration;
+using WebApps.Helpers;
 
 namespace WebApps.Controllers
 {
@@ -19,11 +21,31 @@ namespace WebApps.Controllers
     {
         private readonly IAuthService _authService;
         private readonly IMapper _mapper;
+        private readonly IConfiguration _configuration;
+        private UrlSettings _urlSettings;
 
-        public AuthController(IAuthService authService, IMapper mapper)
+        public AuthController(IAuthService authService, IMapper mapper, IConfiguration configuration)
         {
             _authService = authService;
             _mapper = mapper;
+            _configuration = configuration;
+            _urlSettings = configuration.GetSection("UrlSettings").Get<UrlSettings>();
+        }
+
+        [HttpGet("types")]
+        public async Task<IActionResult> GetAllAsync()
+        {
+            var url = await _authService.ListUrlAsync();
+            var urlResource = _mapper.Map< IEnumerable<Domain.Models.Type>, IEnumerable<TypeResource>>(url);
+            return Ok(urlResource);
+        }
+
+        [HttpGet("roles")]
+        public async Task<IActionResult> GetRolesAsync()
+        {
+            var role = await _authService.ListRoleAsync();
+            var roleResource = _mapper.Map<IEnumerable<Role>, IEnumerable<RoleResource>>(role);
+            return Ok(roleResource  );
         }
 
         [HttpPost("register")]
@@ -45,7 +67,7 @@ namespace WebApps.Controllers
 
             EType[] enumsData = { EType.Scale };
 
-            userMapper.Url = userCredentials.TypeUser[0].ToString() == enumsData[0].ToString() ? "http://192.168.71.170:5001/login" : "www.xvideos.com";
+            userMapper.Url = userCredentials.TypeUser[0].ToString() == enumsData[0].ToString() ? _urlSettings.Scale : _urlSettings.Energy;
             userMapper.Created = DateTime.Now;
             userMapper.LastModified = DateTime.Now;
 
@@ -66,9 +88,27 @@ namespace WebApps.Controllers
             var userAuth = await _authService.Authenticate(userParam.Email, userParam.Password);
 
             if (userAuth == null)
-                return BadRequest(new { message = "Username or password is incorrect" });
+                return BadRequest(new { message = "Email or password is incorrect" });
 
             var userResource = _mapper.Map<User, UserResource>(userAuth);
+
+            return Ok(userResource);
+        }
+
+        [HttpPut("changed")]
+        public async Task<IActionResult> ChangePasswordAsync([FromBody]ResetPasswordResource userParam)
+        {
+            var checkEmail = await _authService.FindByEmailAsync(userParam.Email);
+
+            if(checkEmail == null)
+                return BadRequest(new { message = "Email not found" });
+
+            var userAuth = await _authService.ChangePasswordAsync(userParam.Email, userParam.Password, userParam.PasswordReset);
+
+            if (userAuth == null)
+                return BadRequest(new { message = "Password is incorrect" });
+
+            var userResource = _mapper.Map<User, UserResource>(userAuth.User);
 
             return Ok(userResource);
         }

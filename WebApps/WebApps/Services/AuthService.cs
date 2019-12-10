@@ -53,5 +53,41 @@ namespace WebApps.Services
 
             return user;
         }
+
+        public async Task<AuthResponse> ChangePasswordAsync(string email, string password, string passwordReset)
+        {
+            var userExisting = await _authRepository.FindByEmailAsync(email);
+
+            if (!_passwordHasher.PasswordMatches(password, userExisting.Password))
+            {
+                return null;
+            }
+
+            userExisting.Password = _passwordHasher.HashPassword(passwordReset);
+
+            try
+            {
+                _authRepository.ChangePasswordAsync(userExisting);
+                return new AuthResponse(userExisting);
+            }
+
+            catch (Exception ex)
+            {
+                // Do some logging stuff
+                return new AuthResponse($"An error occurred when updating the schedule: {ex.Message}");
+            }
+        }
+
+        public async Task<IEnumerable<Domain.Models.Type>> ListUrlAsync()
+        {
+            return await _authRepository.ListUrlAsync();
+
+        }
+
+        public async Task<IEnumerable<Role>> ListRoleAsync()
+        {
+            return await _authRepository.ListRoleAsync();
+
+        }
     }
 }
